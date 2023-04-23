@@ -287,11 +287,22 @@ end
 
 --- Close current execution
 function M.run_close()
-  local context = get_project_rootpath()
-  if context then
-    close_runner(pattern .. context.name)
-  else
-    close_runner()
+  -- Get a list of all open buffers
+  local buffers = vim.api.nvim_list_bufs()
+
+  -- Loop through the list of buffers and delete any terminal buffers
+  for _, buf in ipairs(buffers) do
+    local buftype = vim.api.nvim_buf_get_option(buf, "buftype")
+    if buftype == "terminal" then
+      vim.api.nvim_buf_delete(buf, { force = true })
+    end
   end
+  -- local context = get_project_rootpath()
+  -- if context then
+  --   close_runner(pattern .. context.name)
+  -- else
+  --   close_runner()
+  -- end
 end
+
 return M
